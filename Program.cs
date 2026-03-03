@@ -66,8 +66,9 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseSqlServer(
-            "Server=(localdb)\\mssqllocaldb;Database=TrainingDb;Trusted_Connection=True;");
+        options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=TrainingDb;Trusted_Connection=True;")
+        .UseLazyLoadingProxies();
+
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -137,7 +138,6 @@ class Program
         var orderRepo = new Repository<Order>(context);
         var reviewRepo = new Repository<Review>(context);
 
-        // CREATE
         var user = new User { Name = "Іван", Email = "ivan@email.com" };
         userRepo.Add(user);
 
@@ -165,20 +165,30 @@ class Program
         };
         reviewRepo.Add(review);
 
-        // READ
         var users = userRepo.GetAll();
         Console.WriteLine("Користувачі:");
         foreach (var u in users)
         {
             Console.WriteLine($"{u.Id} {u.Name} {u.Email}");
+
+            // Ліниве завантаження Orders
+            foreach (var o in u.Orders)
+            {
+                Console.WriteLine($"  Замовлення {o.Id} від {o.OrderDate}");
+                foreach (var p in o.Products)
+                    Console.WriteLine($"    Продукт: {p.Name} {p.Price} грн");
+            }
+
+            // Ліниве завантаження Reviews
+            foreach (var r in u.Reviews)
+            {
+                Console.WriteLine($"  Відгук на {r.Product?.Name}: {r.Comment} ({r.Rating})");
+            }
         }
 
-        // UPDATE
+
         user.Name = "Іван Петренко";
         userRepo.Update(user);
-
-        // DELETE (приклад)
-        // reviewRepo.Delete(review.Id);
 
         Console.WriteLine("Готово!");
     }
