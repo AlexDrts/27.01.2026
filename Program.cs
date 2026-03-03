@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-#region Entities
 
 public class User
 {
@@ -57,11 +56,6 @@ public class Review
     public int ProductId { get; set; }
     public Product Product { get; set; }
 }
-
-#endregion
-
-#region DbContext
-
 public class AppDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
@@ -87,11 +81,6 @@ public class AppDbContext : DbContext
             .WithMany(p => p.Orders);
     }
 }
-
-#endregion
-
-#region Generic Repository
-
 public class Repository<T> where T : class
 {
     private readonly AppDbContext _context;
@@ -135,8 +124,6 @@ public class Repository<T> where T : class
         }
     }
 }
-
-#endregion
 
 class Program
 {
